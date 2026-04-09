@@ -24,12 +24,12 @@ args = "Run sudo code"
 name = "Run sudo code"
 author = "agent"
 
-[workflows.workflow.metadata]
-outputType = "console"
-
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python sudo_interpreter.py $(ls -t *.sudo | head -1)"
+args = "python sudo_interpreter.py example.sudo"
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [agent]
 stack = "PNPM_WORKSPACE"
@@ -46,3 +46,7 @@ externalPort = 8080
 [[ports]]
 localPort = 8081
 externalPort = 80
+
+[[ports]]
+localPort = 8082
+externalPort = 3000
