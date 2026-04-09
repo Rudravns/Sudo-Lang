@@ -24,12 +24,12 @@ args = "Run sudo code"
 name = "Run sudo code"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python sudo_interpreter.py example.sudo"
-
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python sudo_interpreter.py test.sudo"
 
 [agent]
 stack = "PNPM_WORKSPACE"
