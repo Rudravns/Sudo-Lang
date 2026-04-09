@@ -1,28 +1,28 @@
 # example.sudo
-# Demonstrates all base keywords of the sudo code language.
+# This file demonstrates all base keywords of the sudo code language.
 # Run with: python sudo_interpreter.py example.sudo
 
-# --- Variables ---
+# --- Variables (SET) ---
 SET name <- "Alice"
 SET age  <- 17
 
-# --- Display ---
+# --- Display output (DISPLAY) ---
 DISPLAY "=== Welcome to sudo code ==="
 DISPLAY name
 
-# --- Arithmetic ---
+# --- Simple arithmetic ---
 SET next_year_age <- age + 1
 DISPLAY "Next year you will be:"
 DISPLAY next_year_age
 
-# --- IF / ELSE ---
+# --- Conditional (IF / ELSE) ---
 IF age >= 18 THEN
     DISPLAY "You are an adult."
 ELSE
     DISPLAY "You are not yet an adult."
 END IF
 
-# --- WHILE loop ---
+# --- While loop (WHILE) ---
 SET counter <- 1
 DISPLAY "Counting to 5:"
 WHILE counter <= 5 DO
@@ -30,14 +30,14 @@ WHILE counter <= 5 DO
     SET counter <- counter + 1
 END WHILE
 
-# --- FOR loop ---
+# --- For loop (FOR) ---
 DISPLAY "Squares from 1 to 5:"
 FOR i FROM 1 TO 5
     SET square <- i * i
     DISPLAY square
 END FOR
 
-# --- FUNCTION / RETURN ---
+# --- Function definition and call (FUNCTION / RETURN) ---
 FUNCTION greet(person)
     DISPLAY "Hello,"
     DISPLAY person
@@ -46,6 +46,7 @@ END FUNCTION
 
 SET result <- greet(name)
 
+# --- Another function: add two numbers ---
 FUNCTION add(a, b)
     SET total <- a + b
     RETURN total
@@ -54,3 +55,9 @@ END FUNCTION
 SET sum <- add(10, 32)
 DISPLAY "10 + 32 ="
 DISPLAY sum
+
+# --- Input from user (INPUT) ---
+# Uncomment the lines below to try interactive input:
+# INPUT user_name "Enter your name:"
+# DISPLAY "You entered:"
+# DISPLAY user_name

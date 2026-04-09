@@ -37,13 +37,46 @@ class Parser:
     """
 
     def __init__(self, lines):
-        # Remove blank lines and full-line comments (# ...)
-        self.lines = [
-            line.strip()
-            for line in lines
-            if line.strip() and not line.strip().startswith("#")
-        ]
+        # Remove blank lines and strip comments before storing lines.
+        # Supported comment styles:
+        #   #  ...   (hash — full line or inline)
+        #   // ...   (double-slash — full line or inline)
+        cleaned = []
+        for raw in lines:
+            line = self._strip_comment(raw.strip())
+            if line:
+                cleaned.append(line)
+        self.lines = cleaned
         self.pos = 0
+
+    @staticmethod
+    def _strip_comment(line):
+        """
+        Remove any trailing comment from a line and return the code part.
+        Handles both # and // comment styles.
+        Quoted strings are respected — a # or // inside quotes is NOT a comment.
+        """
+        result = []
+        in_string = None  # tracks the opening quote character (" or ')
+        i = 0
+        while i < len(line):
+            ch = line[i]
+            if in_string:
+                result.append(ch)
+                if ch == in_string:
+                    in_string = None  # closing quote
+            else:
+                if ch in ('"', "'"):
+                    in_string = ch
+                    result.append(ch)
+                elif ch == '#':
+                    break  # rest of line is a comment
+                elif ch == '/' and i + 1 < len(line) and line[i + 1] == '/':
+                    break  # rest of line is a // comment
+                else:
+                    result.append(ch)
+            i += 1
+        return "".join(result).strip()
 
     # ------------------------------------------------------------------ #
     # Internal helpers                                                     #
@@ -112,6 +145,11 @@ class Parser:
         # Strip any trailing parenthesis/arguments to get just the keyword
         keyword = re.split(r'[\s(]', raw_first)[0].upper()
 
+        # ---- Shorthand assignment: varname <- expr  (SET is optional) --
+        # Supports both:  SET x <- 5   and   x <- 5
+        if "<-" in tokens and keyword not in KEYWORDS:
+            return self._parse_assignment(tokens, line)
+
         if keyword == "SET":
             return self._parse_set(tokens, line)
 
@@ -154,6 +192,19 @@ class Parser:
     # Individual statement parsers                                         #
     # Add a new _parse_<keyword>() method for each new keyword.           #
     # ------------------------------------------------------------------ #
+
+    def _parse_assignment(self, tokens, line):
+        """
+        varname <- expression   (shorthand — SET keyword is optional)
+
+        Both styles are equivalent:
+            SET x <- 5
+                x <- 5
+        """
+        arrow = tokens.index("<-")
+        varname = tokens[0]
+        expr = " ".join(tokens[arrow + 1:])
+        return node("SET", var=varname, expr=expr)
 
     def _parse_set(self, tokens, line):
         """
