@@ -24,12 +24,12 @@ args = "Run sudo code"
 name = "Run sudo code"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python sudo_interpreter.py example.sudo"
-
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python sudo_interpreter.py $(ls -t *.sudo | head -1)"
 
 [agent]
 stack = "PNPM_WORKSPACE"
@@ -38,3 +38,11 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 80

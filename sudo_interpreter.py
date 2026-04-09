@@ -141,6 +141,11 @@ class Parser:
 
         keyword = tokens[0].upper()
 
+        # ---- Implicit assignment: varname <- expr  (without SET) -------
+        # Supports: a <- 6  or  a <- b + c
+        if "<-" in tokens and keyword not in KEYWORDS:
+            return self._parse_implicit_assignment(tokens, line)
+
         # ---- SET -------------------------------------------------------
         if keyword == "SET":
             # SET x <- expression
@@ -152,8 +157,8 @@ class Parser:
             return self._parse_input(tokens)
 
         # ---- DISPLAY ---------------------------------------------------
-        elif keyword == "DISPLAY":
-            # DISPLAY expression
+        # Supports both:  DISPLAY expr   and   DISPLAY(expr)
+        elif keyword == "DISPLAY" or re.match(r'^DISPLAY\s*\(', line, re.IGNORECASE):
             return self._parse_display(tokens, line)
 
         # ---- IF --------------------------------------------------------
@@ -199,6 +204,17 @@ class Parser:
     # Individual statement parsers                                         #
     # ------------------------------------------------------------------ #
 
+    def _parse_implicit_assignment(self, tokens, line):
+        """varname <- expression  (shorthand assignment without SET)"""
+        try:
+            arrow_idx = tokens.index("<-")
+        except ValueError:
+            raise ParseError(f"Assignment missing '<-': {line}")
+        varname = tokens[0]
+        expr_tokens = tokens[arrow_idx + 1:]
+        expr = " ".join(expr_tokens)
+        return node("SET", var=varname, expr=expr)
+
     def _parse_set(self, tokens, line):
         """SET varname <- expression"""
         # Find the <- operator
@@ -223,8 +239,14 @@ class Parser:
         return node("INPUT", var=varname, prompt=prompt)
 
     def _parse_display(self, tokens, line):
-        """DISPLAY expression"""
-        expr = " ".join(tokens[1:])
+        """DISPLAY expression  —  also handles  DISPLAY(expression)"""
+        # Check for parenthesised form: DISPLAY(expr) or DISPLAY (expr)
+        paren_match = re.match(r'^DISPLAY\s*\((.+)\)\s*$', line, re.IGNORECASE)
+        if paren_match:
+            expr = paren_match.group(1).strip()
+        else:
+            # Plain form: DISPLAY expr
+            expr = " ".join(tokens[1:])
         return node("DISPLAY", expr=expr)
 
     def _parse_if(self, tokens, line):
