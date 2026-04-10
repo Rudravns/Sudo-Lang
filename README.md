@@ -30,6 +30,9 @@ python sudo_interpreter.py myprogram.sudo
 | `FOR`      | `FOR i FROM 1 TO 10 ... END FOR`       |
 | `FUNCTION` | `FUNCTION name(a, b) ... END FUNCTION` |
 | `RETURN`   | `RETURN value`                         |
+| `TRY/ELSE` | `TRY ... EXCEPT error ...`             | 
+| `CLEAR_CONSOLE` | `CLEAR_CONSOLE`                   |
+
 
 ### Extending the Language
 1. Add the keyword name to the `KEYWORDS` set in `sudo_interpreter.py`
