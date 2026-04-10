@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {
   "version": "0.2.0",
   "configurations": [
@@ -13,19 +12,3 @@
     }
   ]
 }
-=======
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Run Sudo File",
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/sudo_interpreter.py",
-      "args": ["${file}"],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal"
-    }
-  ]
-}
->>>>>>> 25d267d2b8937ae696b825982a0f742d133a0166

@@ -19,6 +19,7 @@ Variable scoping:
 """
 
 import re
+import os
 
 
 class ReturnSignal(Exception):
@@ -110,7 +111,24 @@ class Interpreter:
         elif t == "RETURN":
             value = self.eval_expr(stmt["expr"], scope) if stmt["expr"] else None
             raise ReturnSignal(value)
-
+        
+        # --- CLEAR_CONSOLE -----------------------------------------------
+        elif t == "CLEAR_CONSOLE":
+           #use os.system('cls' if os.name == 'nt' else 'clear') for a more robust solution.
+            if os.name == 'nt':
+                os.system('cls')
+            else:
+                os.system('clear') 
+        
+        elif t == "TRY":
+            try:
+                self.run(stmt["try_body"], scope)
+            except Exception as e:
+                # Store the error message in a special variable for the CATCH block
+                scope["$error"] = str(e)
+                catch_body = stmt.get("catch_body", stmt.get("false_body", []))
+                self.run(catch_body, scope)
+        
         # ---- Unknown node type — ignore --------------------------------
         # Remove this branch to get strict runtime errors on unknown nodes.
         else:

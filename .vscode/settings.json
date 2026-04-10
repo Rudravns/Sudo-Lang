@@ -1,13 +1,5 @@
-<<<<<<< HEAD
 {
   "files.associations": {
     "*.sudo": "sudo"
   }
 }
-=======
-{
-  "files.associations": {
-    "*.sudo": "sudo"
-  }
-}
->>>>>>> 25d267d2b8937ae696b825982a0f742d133a0166

@@ -21,6 +21,7 @@ How blocks work:
 import re
 from .nodes import KEYWORDS, node
 from .lexer import tokenise
+from .util import KEYWORD_NOT_FOUND
 
 
 class ParseError(Exception):
@@ -182,11 +183,20 @@ class Parser:
 
         elif keyword == "RETURN":
             return self._parse_return(tokens)
+        
+        elif keyword == "CLEAR_CONSOLE":
+            return self._parse_CLEAR_CONSOLE(tokens, line)
+        
+        elif keyword == "TRY":
+            return self._parse_try(tokens, line)
+
+        elif keyword == "PASS":
+            return self._parse_pass(tokens, line)
 
         # ---- Unknown / future keyword — silently skip ------------------
         # Remove this branch when you want strict mode (error on unknown).
         else:
-            return None
+            raise KEYWORD_NOT_FOUND(keyword, self.pos)
 
     # ------------------------------------------------------------------ #
     # Individual statement parsers                                         #
@@ -249,6 +259,14 @@ class Parser:
             # Plain form: DISPLAY expr  (everything after the keyword)
             expr = " ".join(tokens[1:])
         return node("DISPLAY", expr=expr)
+
+    def _parse_CLEAR_CONSOLE(self, tokens, line):
+        """
+        CLEAR_CONSOLE
+
+        Clears the console output. No arguments.
+        """
+        return node("CLEAR_CONSOLE")
 
     def _parse_if(self, tokens):
         """
@@ -342,3 +360,33 @@ class Parser:
         """
         expr = " ".join(tokens[1:])
         return node("RETURN", expr=expr)
+
+    def _parse_try(self, tokens, line):
+        """
+        TRY
+            ...
+        CATCH
+            ...
+        END TRY
+
+        CATCH is optional.
+        """
+        true_body, terminator = self.parse_block({"CATCH", "END"})
+
+        false_body = []
+        if terminator == "CATCH":
+            self._consume()  # consume the CATCH line
+            false_body, _ = self.parse_block({"END"})
+
+        if not self._at_end():
+            self._consume()  # consume END TRY
+
+        return node("TRY", true_body=true_body, false_body=false_body)
+
+    def _parse_pass(self, tokens, line):
+        """
+        PASS
+
+        Does nothing. Useful as a placeholder in empty blocks.
+        """
+        return node("PASS")

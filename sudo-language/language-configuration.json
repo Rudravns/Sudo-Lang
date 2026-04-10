@@ -1,7 +1,7 @@
-<<<<<<< HEAD
+
 {
   "comments": {
-    "lineComment": "#"
+    "lineComment": "//"
   },
   "brackets": [
     ["{", "}"],
@@ -15,21 +15,3 @@
     { "open": "\"", "close": "\"" }
   ]
 }
-=======
-{
-  "comments": {
-    "lineComment": "#"
-  },
-  "brackets": [
-    ["{", "}"],
-    ["[", "]"],
-    ["(", ")"]
-  ],
-  "autoClosingPairs": [
-    { "open": "\"", "close": "\"" }
-  ],
-  "surroundingPairs": [
-    { "open": "\"", "close": "\"" }
-  ]
-}
->>>>>>> 25d267d2b8937ae696b825982a0f742d133a0166
