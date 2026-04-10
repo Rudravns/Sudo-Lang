@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Sudo Code",
@@ -47,3 +48,54 @@
     }
   }
 }
+=======
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Sudo Code",
+  "scopeName": "source.sudo",
+  "fileTypes": ["sudo"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#keywords" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+    "comments": {
+      "name": "comment.line.number-sign.sudo",
+      "match": "#.*$"
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.sudo",
+          "match": "\\b(IF|ELSE|WHILE|FOR|THEN|DO|FROM|TO|END)\\b"
+        },
+        {
+          "name": "keyword.declaration.sudo",
+          "match": "\\b(FUNCTION|RETURN)\\b"
+        },
+        {
+          "name": "keyword.other.sudo",
+          "match": "\\b(SET|INPUT|DISPLAY)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.sudo",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": []
+    },
+    "numbers": {
+      "name": "constant.numeric.sudo",
+      "match": "\\b[0-9]+(\\.[0-9]+)?\\b"
+    },
+    "operators": {
+      "name": "keyword.operator.sudo",
+      "match": "<-|<=|>=|!=|==|<|>|\\+|-|\\*|/|%|\\bAND\\b|\\bOR\\b|\\bNOT\\b|\\bMOD\\b"
+    }
+  }
+}
+>>>>>>> 25d267d2b8937ae696b825982a0f742d133a0166
