@@ -125,12 +125,17 @@ class Interpreter:
         Evaluate a sudo-code expression string and return a Python value.
 
         Supported expression forms:
-          "hello"          — string literal (double or single quoted)
+          "hello"          — string literal  (quotes required for plain text)
           42 / 3.14        — numeric literal
-          x                — variable lookup
+          x                — variable lookup (raises NameError if not defined)
           name(a, b)       — function call
           x + y * 2        — arithmetic / comparison (via safe Python eval)
           x AND y          — logical operators (AND, OR, NOT, MOD)
+
+        Rules enforced here:
+          - Plain text must be quoted:  DISPLAY "hello"  not  DISPLAY hello
+          - A bare name with no quotes is always a variable lookup.
+            If the variable does not exist a RuntimeError is raised.
 
         To add new expression forms, extend this method or _eval_python_expr().
         """
@@ -138,12 +143,12 @@ class Interpreter:
         if not expr:
             return None
 
-        # Quoted string literal
+        # ---- Quoted string literal  "hello"  or  'hello' ----------------
         if (expr.startswith('"') and expr.endswith('"')) or \
            (expr.startswith("'") and expr.endswith("'")):
             return expr[1:-1]
 
-        # Function call:  name(arg1, arg2, ...)
+        # ---- Function call  name(arg1, arg2) ----------------------------
         func_match = re.match(r'^(\w+)\(([^)]*)\)$', expr)
         if func_match:
             fname = func_match.group(1)
@@ -155,7 +160,35 @@ class Interpreter:
             ]
             return self._call_function(fname, args, scope)
 
-        # Arithmetic / comparison expression
+        # ---- Numeric literal  42  or  3.14  --------------------------------
+        try:
+            return int(expr)
+        except ValueError:
+            pass
+        try:
+            return float(expr)
+        except ValueError:
+            pass
+
+        # ---- Bare identifier  x  ----------------------------------------
+        # A single plain word (no spaces, no operators) is a variable lookup.
+        # Raises RuntimeError if the variable has not been defined.
+        if re.match(r'^[A-Za-z_]\w*$', expr):
+            # Allow Python built-in literals
+            if expr == "True":
+                return True
+            if expr == "False":
+                return False
+            if expr == "None":
+                return None
+            if expr in scope:
+                return scope[expr]
+            raise RuntimeError(
+                f"Variable '{expr}' is not defined. "
+                f"Use quotes for text: \"{expr}\""
+            )
+
+        # ---- Arithmetic / comparison expression  x + 1,  x > 0, etc. ---
         return self._eval_python_expr(expr, scope)
 
     def _eval_python_expr(self, expr, scope):
@@ -190,8 +223,11 @@ class Interpreter:
 
         try:
             return eval(expr, {"__builtins__": {}}, safe_env)
+        except NameError as e:
+            # A variable used in the expression was not defined
+            raise RuntimeError(str(e).replace("name '", "Variable '").replace("' is not defined", "' is not defined"))
         except Exception:
-            # Best-effort fallback: return the expression as a plain string
+            # Other eval errors (syntax, type, etc.) — return as plain string
             return expr
 
     # ------------------------------------------------------------------ #

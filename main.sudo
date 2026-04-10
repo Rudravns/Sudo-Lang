@@ -1,0 +1,9 @@
+
+number <- 4
+
+WHILE (number MOD 2 = 1) DO
+  number ← number - 1
+END 
+
+
+DISPLAY number

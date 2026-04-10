@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Sudo File",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/sudo_interpreter.py",
+      "args": ["${file}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}
