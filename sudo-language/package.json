@@ -1,0 +1,30 @@
+{
+  "name": "sudo-language",
+  "displayName": "Sudo Code",
+  "description": "Syntax highlighting for Sudo Code language files.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "sudo",
+        "aliases": ["Sudo", "Sudo Code"],
+        "extensions": [".sudo"],
+        "configuration": "language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "sudo",
+        "scopeName": "source.sudo",
+        "path": "syntaxes/sudo.tmLanguage.json"
+      }
+    ]
+  }
+}
