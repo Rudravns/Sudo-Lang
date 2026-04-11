@@ -32,11 +32,12 @@ def main():
         print(f"Error: File not found: '{filepath}'")
         sys.exit(1)
     except ParseError as e:
+        pass
         print(f"Parse error: {e}")
         sys.exit(1)
     except Exception as e:
         print(f"Runtime error: {e}")
-        sys.exit(1)
+        
 
 
 if __name__ == "__main__":

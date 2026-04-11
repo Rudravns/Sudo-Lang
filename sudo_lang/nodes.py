@@ -36,6 +36,12 @@ KEYWORDS = {
     "FOR",
     "FUNCTION",
     "RETURN",
+    "CLEAR_CONSOLE",
+    "TRY",
+    "CATCH",
+    "PASS",
+
+
     # NEW KEYWORDS GO HERE — also update parser.py and interpreter.py
 }
 

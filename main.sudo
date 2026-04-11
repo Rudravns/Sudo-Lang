@@ -1,9 +1,28 @@
+CLEAR_CONSOLE
 
-number <- 4
+Variables <- "heheheheheh"
 
-WHILE (number MOD 2 = 1) DO
-  number ← number - 1
-END 
+FUNCTION fibonacci(times)
+    a <- 0
+    b <- 1
+    
+    FOR i FROM 1 TO times
+        temp <- a
+        a <- b
+        b <- temp + b
+    END FOR
 
+    RETURN a
+END FUNCTION 
 
-DISPLAY number
+DISPLAY fibonacci(10) // Should display 55
+
+TRY
+    DISPLAY rewq
+CATCH error
+    PASS
+END TRY
+
+INPUT name "your name?"
+
+DISPLAY name

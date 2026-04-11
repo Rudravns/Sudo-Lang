@@ -21,6 +21,7 @@ How blocks work:
 import re
 from .nodes import KEYWORDS, node
 from .lexer import tokenise
+from .util import KEYWORD_NOT_FOUND
 
 
 class ParseError(Exception):
@@ -168,6 +169,9 @@ class Parser:
         elif keyword == "ELSE":
             return None  # handled inside _parse_if
 
+        elif keyword == "CATCH":
+            return None  # handled inside _parse_try
+
         elif keyword.startswith("END"):
             return None  # block terminators consumed by parse_block
 
@@ -182,11 +186,20 @@ class Parser:
 
         elif keyword == "RETURN":
             return self._parse_return(tokens)
+        
+        elif keyword == "CLEAR_CONSOLE":
+            return self._parse_CLEAR_CONSOLE(tokens, line)
+        
+        elif keyword == "TRY":
+            return self._parse_try(tokens, line)
+
+        elif keyword == "PASS":
+            return self._parse_pass(tokens, line)
 
         # ---- Unknown / future keyword — silently skip ------------------
         # Remove this branch when you want strict mode (error on unknown).
         else:
-            return None
+            raise KEYWORD_NOT_FOUND(keyword, self.pos)
 
     # ------------------------------------------------------------------ #
     # Individual statement parsers                                         #
@@ -225,14 +238,22 @@ class Parser:
         """
         INPUT varname
         INPUT varname "optional prompt"
-
+        INPUT(prompt) - returns a value to store in varname
         Reads a value from the user and stores it in varname.
         """
-        if len(tokens) < 2:
-            raise ParseError(f"INPUT requires a variable name: {line}")
-        varname = tokens[1]
-        prompt = " ".join(tokens[2:]) if len(tokens) > 2 else ""
-        return node("INPUT", var=varname, prompt=prompt)
+        # Try parenthesised form first: INPUT(...) or INPUT (...)
+        paren_match = re.match(r'^INPUT\s*\((\w+)\)\s*$', line, re.IGNORECASE)
+        if paren_match:
+            varname = paren_match.group(1)
+            prompt = prompt = " ".join(tokens[1:]) if len(tokens) > 1 else ""
+            return node("INPUT", var=varname, prompt=prompt)
+
+        else:
+            if len(tokens) < 2:
+                raise ParseError(f"INPUT requires a variable name: {line}")
+            varname = tokens[1]
+            prompt = " ".join(tokens[2:]) if len(tokens) > 2 else ""
+            return node("INPUT", var=varname, prompt=prompt)
 
     def _parse_display(self, tokens, line):
         """
@@ -249,6 +270,14 @@ class Parser:
             # Plain form: DISPLAY expr  (everything after the keyword)
             expr = " ".join(tokens[1:])
         return node("DISPLAY", expr=expr)
+
+    def _parse_CLEAR_CONSOLE(self, tokens, line):
+        """
+        CLEAR_CONSOLE
+
+        Clears the console output. No arguments.
+        """
+        return node("CLEAR_CONSOLE")
 
     def _parse_if(self, tokens):
         """
@@ -342,3 +371,36 @@ class Parser:
         """
         expr = " ".join(tokens[1:])
         return node("RETURN", expr=expr)
+
+    def _parse_try(self, tokens, line):
+        """
+        TRY
+            ...
+        CATCH
+            ...
+        END TRY
+
+        CATCH is optional.
+        """
+        try_body, terminator = self.parse_block({"CATCH", "END"})
+
+        catch_body = []
+        error_var = None
+        if terminator == "CATCH":
+            catch_tokens = tokenise(self._consume())
+            if len(catch_tokens) > 1:
+                error_var = catch_tokens[1]
+            catch_body, _ = self.parse_block({"END"})
+
+        if not self._at_end():
+            self._consume()  # consume END TRY
+
+        return node("TRY", try_body=try_body, catch_body=catch_body, error_var=error_var)
+
+    def _parse_pass(self, tokens, line):
+        """
+        PASS
+
+        Does nothing. Useful as a placeholder in empty blocks.
+        """
+        return node("PASS")

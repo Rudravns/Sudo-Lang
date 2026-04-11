@@ -1,0 +1,45 @@
+CLEAR_CONSOLE //clear the console
+
+//Assignment, Display, and Input
+
+expression <- "A" //set expression to "A"
+
+//Evaluates expression and then assigns a copy of the result to the variable a
+a <- expression
+
+//Displays the value of expression, followed by a space.
+DISPLAY(expression)
+
+//Accepts a value from the user and returns the input value
+
+var <- INPUT("Enter ur name")
+DISPLAY(var)
+
+
+//Arithmetic Operators and Numeric Procedures
+//The arithmetic operators +, -, *, and / are used to perfor, arithmetic on a and b.
+//For example, 17 / 5 evaluates to 3.4.
+//The order of operations used in mathematics applies when evaluating expressions. 
+
+a <- 17
+b <- 5
+
+c <- a + b
+d <- a - b
+e <- a * b
+f <- a / b
+
+DISPLAY(a)
+DISPLAY(b)
+DISPLAY(c)
+DISPLAY(d)
+DISPLAY(e)
+DISPLAY(f)
+
+TRY 
+    def
+EXCEPT error
+    DISPLAY error
+ENDTRY
+
+

@@ -19,6 +19,7 @@ Variable scoping:
 """
 
 import re
+import os
 
 
 class ReturnSignal(Exception):
@@ -32,7 +33,7 @@ class ReturnSignal(Exception):
 
 class Interpreter:
     """
-    Walks the AST produced by Parser and executes each node.
+    Walks the AST(Abstract Syntax Tree) produced by Parser and executes each node.
 
     Usage:
         interp = Interpreter()
@@ -110,6 +111,31 @@ class Interpreter:
         elif t == "RETURN":
             value = self.eval_expr(stmt["expr"], scope) if stmt["expr"] else None
             raise ReturnSignal(value)
+        
+        # --- CLEAR_CONSOLE -----------------------------------------------
+        elif t == "CLEAR_CONSOLE":
+           #use os.system('cls' if os.name == 'nt' else 'clear') for a more robust solution.
+            if os.name == 'nt':
+                os.system('cls')
+            else:
+                os.system('clear') 
+        
+        # ---- TRY ... CATCH [error_var] ... END TRY ---------------------
+        elif t == "TRY":
+            try:
+                self.run(stmt["try_body"], scope)
+            except (ReturnSignal, SystemExit):
+                raise  # never swallow a RETURN or a sys.exit()
+            except Exception as e:
+                error_var = stmt.get("error_var")
+                if error_var:
+                    scope[error_var] = str(e)
+                scope["$error"] = str(e)  # always available inside CATCH
+                self.run(stmt.get("catch_body", []), scope)
+
+        # ---- PASS — do nothing (placeholder for empty blocks) ----------
+        elif t == "PASS":
+            pass
 
         # ---- Unknown node type — ignore --------------------------------
         # Remove this branch to get strict runtime errors on unknown nodes.
@@ -239,6 +265,15 @@ class Interpreter:
         Look up a user-defined FUNCTION by name and call it with args.
         Creates a fresh local scope populated with parameter values.
         """
+        # Handle built-in functions
+        if name.upper() == "INPUT":
+            prompt = args[0] if args else ""
+            try:
+                raw = input(f"{prompt} " if prompt else "")
+            except EOFError:
+                raw = ""
+            return self._coerce(raw)
+
         if name not in self.functions:
             raise NameError(f"Undefined function: '{name}'")
         func = self.functions[name]

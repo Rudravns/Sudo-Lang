@@ -1,5 +1,17 @@
 {
   "files.associations": {
-    "*.sudo": "sudo"
+    "*.sudo": "plaintext"
+  },
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": false
+  },
+  "editor.snippetSuggestions": "top",
+  "editor.wordBasedSuggestions": "matchingDocuments",
+  "[plaintext]": {
+    "editor.quickSuggestions": {
+      "other": true
+    }
   }
 }
