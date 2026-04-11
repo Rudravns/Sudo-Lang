@@ -371,36 +371,3 @@ class Parser:
         """
         expr = " ".join(tokens[1:])
         return node("RETURN", expr=expr)
-
-    def _parse_try(self, tokens, line):
-        """
-        TRY
-            ...
-        CATCH
-            ...
-        END TRY
-
-        CATCH is optional.
-        """
-        try_body, terminator = self.parse_block({"CATCH", "END"})
-
-        catch_body = []
-        error_var = None
-        if terminator == "CATCH":
-            catch_tokens = tokenise(self._consume())
-            if len(catch_tokens) > 1:
-                error_var = catch_tokens[1]
-            catch_body, _ = self.parse_block({"END"})
-
-        if not self._at_end():
-            self._consume()  # consume END TRY
-
-        return node("TRY", try_body=try_body, catch_body=catch_body, error_var=error_var)
-
-    def _parse_pass(self, tokens, line):
-        """
-        PASS
-
-        Does nothing. Useful as a placeholder in empty blocks.
-        """
-        return node("PASS")

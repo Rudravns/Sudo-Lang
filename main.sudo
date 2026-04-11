@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 CLEAR_CONSOLE
 
 Variables <- "heheheheheh"
@@ -26,3 +27,29 @@ END TRY
 INPUT name "your name?"
 
 DISPLAY name
+=======
+CLEAR_CONSOLE
+
+Variables <- "heheheheheh"
+
+FUNCTION fibonacci(times)
+    a <- 0
+    b <- 1
+    
+    FOR i FROM 1 TO times
+        temp <- a
+        a <- b
+        b <- temp + b
+    END FOR
+
+    RETURN a
+END FUNCTION
+
+DISPLAY fibonacci(10) // Should display 55
+
+TRY
+    DISPLAY rewq
+CATCH error
+    PASS
+END TRY
+>>>>>>> 6b57c60b73b91e74482c9e44f1a09859fb26185e
