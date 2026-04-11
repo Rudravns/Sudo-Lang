@@ -41,6 +41,9 @@ KEYWORDS = {
     "CATCH",
     "PASS",
 
+    # Aliases — accepted as alternatives to the canonical keyword above
+    "DEF",     # alias for FUNCTION
+    "EXCEPT",  # alias for CATCH
 
     # NEW KEYWORDS GO HERE — also update parser.py and interpreter.py
 }

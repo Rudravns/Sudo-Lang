@@ -36,8 +36,8 @@ DISPLAY(d)
 DISPLAY(e)
 DISPLAY(f)
 
-TRY 
-    def
+TRY
+    PASS
 EXCEPT error
     DISPLAY error
 ENDTRY

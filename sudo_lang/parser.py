@@ -169,7 +169,7 @@ class Parser:
         elif keyword == "ELSE":
             return None  # handled inside _parse_if
 
-        elif keyword == "CATCH":
+        elif keyword in ("CATCH", "EXCEPT"):
             return None  # handled inside _parse_try
 
         elif keyword.startswith("END"):
@@ -181,7 +181,7 @@ class Parser:
         elif keyword == "FOR":
             return self._parse_for(tokens, line)
 
-        elif keyword == "FUNCTION":
+        elif keyword in ("FUNCTION", "DEF"):
             return self._parse_function(tokens, line)
 
         elif keyword == "RETURN":
@@ -382,18 +382,19 @@ class Parser:
 
         CATCH is optional.
         """
-        try_body, terminator = self.parse_block({"CATCH", "END"})
+        # Accept CATCH or EXCEPT as the handler opener; END / ENDTRY as the closer
+        try_body, terminator = self.parse_block({"CATCH", "EXCEPT", "END", "ENDTRY"})
 
         catch_body = []
         error_var = None
-        if terminator == "CATCH":
+        if terminator in ("CATCH", "EXCEPT"):
             catch_tokens = tokenise(self._consume())
             if len(catch_tokens) > 1:
                 error_var = catch_tokens[1]
-            catch_body, _ = self.parse_block({"END"})
+            catch_body, _ = self.parse_block({"END", "ENDTRY"})
 
         if not self._at_end():
-            self._consume()  # consume END TRY
+            self._consume()  # consume END TRY / ENDTRY
 
         return node("TRY", try_body=try_body, catch_body=catch_body, error_var=error_var)
 
