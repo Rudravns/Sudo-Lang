@@ -181,7 +181,7 @@ class Parser:
         elif keyword == "FOR":
             return self._parse_for(tokens, line)
 
-        elif keyword in ("FUNCTION", "DEF"):
+        elif keyword == "FUNCTION":
             return self._parse_function(tokens, line)
 
         elif keyword == "RETURN":
@@ -196,10 +196,20 @@ class Parser:
         elif keyword == "PASS":
             return self._parse_pass(tokens, line)
 
-        # ---- Unknown / future keyword — silently skip ------------------
-        # Remove this branch when you want strict mode (error on unknown).
+        elif keyword == "USING":
+            return self._parse_using(tokens, line)
+
+        # ---- Expression statement — bare expression on its own line -------
+        # If the line isn't a recognised keyword, treat the whole line as an
+        # expression that is evaluated at runtime (result discarded).
+        # This lets TRY/CATCH capture undefined-variable errors, e.g.:
+        #   TRY
+        #       ERWREW          <- runtime error, caught by CATCH
+        #   CATCH
+        #       DISPLAY error
+        #   END TRY
         else:
-            raise KEYWORD_NOT_FOUND(keyword, self.pos)
+            return node("EXPR", expr=line)
 
     # ------------------------------------------------------------------ #
     # Individual statement parsers                                         #
@@ -389,8 +399,8 @@ class Parser:
         error_var = None
         if terminator in ("CATCH", "EXCEPT"):
             catch_tokens = tokenise(self._consume())
-            if len(catch_tokens) > 1:
-                error_var = catch_tokens[1]
+            # Default error variable is always "error"; a custom name can follow CATCH
+            error_var = catch_tokens[1] if len(catch_tokens) > 1 else "error"
             catch_body, _ = self.parse_block({"END", "ENDTRY"})
 
         if not self._at_end():
@@ -405,3 +415,18 @@ class Parser:
         Does nothing. Useful as a placeholder in empty blocks.
         """
         return node("PASS")
+
+    def _parse_using(self, tokens, line):
+        """
+        USING filename
+
+        Imports and executes another .sudo file in the current scope.
+        The filename is taken as-is (quotes are stripped if present).
+        If no extension is given, .sudo is appended automatically.
+        """
+        if len(tokens) < 2:
+            raise ParseError("USING requires a filename: USING myfile")
+        filename = tokens[1].strip('"').strip("'")
+        if not filename.endswith(".sudo"):
+            filename += ".sudo"
+        return node("USING", filename=filename)

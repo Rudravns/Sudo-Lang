@@ -37,7 +37,7 @@ DISPLAY(e)
 DISPLAY(f)
 
 TRY
-    PASS
+    erwrew
 EXCEPT error
     DISPLAY error
 ENDTRY

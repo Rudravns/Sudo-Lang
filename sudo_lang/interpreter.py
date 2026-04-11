@@ -127,15 +127,38 @@ class Interpreter:
             except (ReturnSignal, SystemExit):
                 raise  # never swallow a RETURN or a sys.exit()
             except Exception as e:
-                error_var = stmt.get("error_var")
-                if error_var:
-                    scope[error_var] = str(e)
-                scope["$error"] = str(e)  # always available inside CATCH
+                msg = str(e)
+                # "error" is ALWAYS set so DISPLAY error works in any CATCH block
+                scope["error"] = msg
+                # Also set custom variable name if one was given after CATCH
+                custom = stmt.get("error_var")
+                if custom and custom != "error":
+                    scope[custom] = msg
                 self.run(stmt.get("catch_body", []), scope)
 
         # ---- PASS — do nothing (placeholder for empty blocks) ----------
         elif t == "PASS":
             pass
+
+        # ---- EXPR — standalone expression statement --------------------
+        # Evaluates the expression and discards the result.
+        # Lets TRY/CATCH capture runtime errors from bare identifiers etc.
+        elif t == "EXPR":
+            self.eval_expr(stmt["expr"], scope)
+
+        # ---- USING filename — import and run another .sudo file --------
+        elif t == "USING":
+            filename = stmt["filename"]
+            try:
+                with open(filename, "r") as f:
+                    source = f.readlines()
+            except FileNotFoundError:
+                raise RuntimeError(f"USING: file not found: '{filename}'")
+            from .parser import Parser
+            sub_ast = Parser(source).parse()
+            # Run imported file in the current scope so its variables and
+            # functions are available to the caller after the USING line.
+            self.run(sub_ast, scope)
 
         # ---- Unknown node type — ignore --------------------------------
         # Remove this branch to get strict runtime errors on unknown nodes.

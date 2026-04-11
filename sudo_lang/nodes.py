@@ -42,8 +42,10 @@ KEYWORDS = {
     "PASS",
 
     # Aliases — accepted as alternatives to the canonical keyword above
-    "DEF",     # alias for FUNCTION
     "EXCEPT",  # alias for CATCH
+
+    # File import
+    "USING",
 
     # NEW KEYWORDS GO HERE — also update parser.py and interpreter.py
 }
