@@ -120,6 +120,7 @@ class Interpreter:
             else:
                 os.system('clear') 
         
+<<<<<<< HEAD
         # ---- TRY ... CATCH [error_var] ... END TRY ---------------------
         elif t == "TRY":
             try:
@@ -140,6 +141,7 @@ class Interpreter:
         elif t == "PASS":
             pass
 
+<<<<<<< HEAD
         # ---- EXPR — standalone expression statement --------------------
         # Evaluates the expression and discards the result.
         # Lets TRY/CATCH capture runtime errors from bare identifiers etc.
@@ -166,6 +168,19 @@ class Interpreter:
             scope[var_name] = items
                 
 
+=======
+=======
+        elif t == "TRY":
+            try:
+                self.run(stmt["try_body"], scope)
+            except Exception as e:
+                # Store the error message in a special variable for the CATCH block
+                scope["$error"] = str(e)
+                catch_body = stmt.get("catch_body", stmt.get("false_body", []))
+                self.run(catch_body, scope)
+        
+>>>>>>> 6b57c60b73b91e74482c9e44f1a09859fb26185e
+>>>>>>> a7852da16b35f3afc327267c4906d96bc3ec42fd
         # ---- Unknown node type — ignore --------------------------------
         # Remove this branch to get strict runtime errors on unknown nodes.
         else:

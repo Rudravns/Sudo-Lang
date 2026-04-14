@@ -1,5 +1,6 @@
 {
   "files.associations": {
+<<<<<<< HEAD
     "*.sudo": "plaintext"
   },
   "editor.quickSuggestions": {
@@ -13,5 +14,8 @@
     "editor.quickSuggestions": {
       "other": true
     }
+=======
+    "*.sudo": "sudo"
+>>>>>>> 6b57c60b73b91e74482c9e44f1a09859fb26185e
   }
 }

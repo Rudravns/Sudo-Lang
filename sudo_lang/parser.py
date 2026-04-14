@@ -400,6 +400,7 @@ class Parser:
         """
         expr = " ".join(tokens[1:])
         return node("RETURN", expr=expr)
+<<<<<<< HEAD
 
     def _parse_try(self, tokens, line):
         """
@@ -449,3 +450,5 @@ class Parser:
         if not filename.endswith(".sudo"):
             filename += ".sudo"
         return node("USING", filename=filename)
+=======
+>>>>>>> a7852da16b35f3afc327267c4906d96bc3ec42fd
