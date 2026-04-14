@@ -40,10 +40,8 @@ def tokenise(line):
 
 if __name__ == "__main__":
     for sample in [
-        'SET x <- 5',
-        'aple<-64',
-        'DISPLAY "hello world"',
-        'IF x >= 0 THEN',
-        'WHILE count != 0 DO',
+       "REPEAT_UNTIL condition",
+        "    PASS",
+        "END REPEAT_UNTIL"
     ]:
         print(f"{sample!r:40s} -> {tokenise(sample)}")

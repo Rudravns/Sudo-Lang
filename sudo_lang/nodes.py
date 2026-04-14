@@ -17,7 +17,7 @@ Example node shapes:
     {"type": "DISPLAY",  "expr": "x"}
     {"type": "IF",       "condition": "x > 0", "true_body": [...], "false_body": [...]}
     {"type": "WHILE",    "condition": "x < 10", "body": [...]}
-    {"type": "FOR",      "var": "i", "start": "1", "end": "5", "body": [...]}
+    {"type": "REPEAT",   "condition": "x < 10", "body": [...]}
     {"type": "FUNCTION", "name": "greet", "params": ["name"], "body": [...]}
     {"type": "RETURN",   "expr": "value"}
     {"type": "INPUT",    "var": "x", "prompt": ""}
@@ -32,8 +32,8 @@ KEYWORDS = {
     "DISPLAY",
     "IF",
     "ELSE",
-    "WHILE",
-    "FOR",
+    "REPEAT_UNTIL",  # "REPEAT ... UNTIL" loop, condition at end of block
+    "REPEAT",
     "FUNCTION",
     "RETURN",
     "CLEAR_CONSOLE",

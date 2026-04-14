@@ -1,3 +1,5 @@
+USING main //.sudo file
+
 CLEAR_CONSOLE //clear the console
 
 //Assignment, Display, and Input
@@ -12,7 +14,7 @@ DISPLAY(expression)
 
 //Accepts a value from the user and returns the input value
 
-var <- INPUT("Enter ur name")
+var <- INPUT("Enter ur name") #comment to make checking easier
 DISPLAY(var)
 
 
@@ -36,10 +38,14 @@ DISPLAY(d)
 DISPLAY(e)
 DISPLAY(f)
 
+//this is not in the APCSP guide ... BUT is a really important block
 TRY
     erwrew
 EXCEPT error
     DISPLAY error
 ENDTRY
 
+//again not in apcsp but imports are really important
+fib <- fibonacci(10) // Should display 55
+DISPLAY fib
 

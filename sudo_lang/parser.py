@@ -19,6 +19,7 @@ How blocks work:
 """
 
 import re
+import time
 from .nodes import KEYWORDS, node
 from .lexer import tokenise
 from .util import KEYWORD_NOT_FOUND
@@ -175,11 +176,11 @@ class Parser:
         elif keyword.startswith("END"):
             return None  # block terminators consumed by parse_block
 
-        elif keyword == "WHILE":
-            return self._parse_while(tokens)
+        elif keyword == "REPEAT_UNTIL":
+            return self._parse_repeat_until(tokens)
 
-        elif keyword == "FOR":
-            return self._parse_for(tokens, line)
+        elif keyword == "REPEAT":
+            return self._parse_repeat(tokens, line)
 
         elif keyword == "FUNCTION":
             return self._parse_function(tokens, line)
@@ -234,7 +235,25 @@ class Parser:
         SET varname <- expression
 
         The <- operator is required.  Everything after <- is the expression.
+
+        Use this with list item assignment to avoid ambiguity with the shorthand form:
+        SET mylist[0] <- 5   (valid)
+        mylist[0] <- 5     (valid)
+
         """
+        #check is it list assignment?
+        list_assign = re.match(r'^(\w+\[.*\])\s*<-.*$', line)
+        if list_assign:
+            #get the list name and index
+            varname = list_assign.group(1)
+            #create a display node for debugging
+            node("DISPLAY", expr=f"Parsing list assignment to {varname}")
+            expr = line.split("<-", 1)[1].strip() # everything after the first <- is the expression
+            #instead of creating a SET node, we create a special node for list assignment
+            return node("LIST_SET", var=varname, expr=expr)
+        
+
+
         if "<-" not in tokens:
             raise ParseError(f"SET requires '<-' operator: {line}")
         arrow = tokens.index("<-")
@@ -315,42 +334,42 @@ class Parser:
 
         return node("IF", condition=condition, true_body=true_body, false_body=false_body)
 
-    def _parse_while(self, tokens):
+    def _parse_repeat_until(self, tokens):
         """
-        WHILE condition DO
+        REPEAT_UNTIL condition
             ...
-        END WHILE
+        END REPEAT_UNTIL
 
         DO is optional.
         """
         upper = [t.upper() for t in tokens]
-        do_idx = upper.index("DO") if "DO" in upper else len(tokens)
-        condition = " ".join(tokens[1:do_idx])
+        condition = " ".join(tokens[1:])
 
         body, _ = self.parse_block({"END"})
         if not self._at_end():
-            self._consume()  # consume END WHILE
+            self._consume()  # consume END REPEAT_UNTIL
 
         return node("WHILE", condition=condition, body=body)
 
-    def _parse_for(self, tokens, line):
+    def _parse_repeat(self, tokens, line):
         """
-        FOR varname FROM start TO end
+        REPEAT n TIMES
             ...
-        END FOR
+        END REPEAT
         """
         upper = [t.upper() for t in tokens]
-        if "FROM" not in upper or "TO" not in upper:
-            raise ParseError(f"FOR requires FROM and TO: {line}")
-        from_idx = upper.index("FROM")
-        to_idx = upper.index("TO")
-        varname = tokens[1]
-        start_expr = " ".join(tokens[from_idx + 1:to_idx])
-        end_expr = " ".join(tokens[to_idx + 1:])
-
+        if "TIMES" not in upper:
+            raise ParseError(f"REPEAT requires 'TIMES': {line}")
+        times_idx = upper.index("TIMES")
+        if times_idx < 2:
+            raise ParseError(f"REPEAT missing iteration count: {line}")
+        count_expr = " ".join(tokens[1:times_idx])
+        varname = f"_i{self.pos}"  # unique loop variable name based on current line number
+        start_expr = "0"
+        end_expr = count_expr
         body, _ = self.parse_block({"END"})
         if not self._at_end():
-            self._consume()  # consume END FOR
+            self._consume()  # consume END REPEAT   
 
         return node("FOR", var=varname, start=start_expr, end=end_expr, body=body)
 

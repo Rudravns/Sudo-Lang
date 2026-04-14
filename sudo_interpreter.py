@@ -13,8 +13,9 @@ The actual language implementation lives in the sudo_lang/ package:
 
 import sys
 from sudo_lang import run_file
-from sudo_lang.parser import ParseError
-
+from sudo_lang.lexer import tokenise
+from sudo_lang.parser import ParseError, Parser
+from sudo_lang.util import ParseError, RuntimeError
 
 def main():
     if len(sys.argv) < 2:
@@ -28,15 +29,23 @@ def main():
 
     try:
         run_file(filepath)
+        #print the tokenised and parsed AST for debugging
+        if True:  # Set to True to enable token/AST debug output
+            with open(filepath, "r", encoding="utf-8") as f:
+                source = f.readlines()
+                print("Tokenised lines:")
+                for line in source:
+                    print(f"{line!r:40s} -> {tokenise(line)}")
+                parser = Parser(source)
+                
     except FileNotFoundError:
         print(f"Error: File not found: '{filepath}'")
         sys.exit(1)
     except ParseError as e:
         pass
-        print(f"Parse error: {e}")
-        sys.exit(1)
+        raise ParseError(e.args[0], e.line_num, exit_after=True)
     except Exception as e:
-        print(f"Runtime error: {e}")
+        raise RuntimeError(f"Unexpected error: {e}", exit_after=True)
         
 
 

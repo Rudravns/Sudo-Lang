@@ -160,6 +160,12 @@ class Interpreter:
             # functions are available to the caller after the USING line.
             self.run(sub_ast, scope)
 
+        elif t == "LIST_SET":
+            var_name = stmt["var"]
+            items = [self.eval_expr(item, scope) for item in stmt["items"]]
+            scope[var_name] = items
+                
+
         # ---- Unknown node type — ignore --------------------------------
         # Remove this branch to get strict runtime errors on unknown nodes.
         else:
